@@ -30,6 +30,7 @@ func (db *UserRepository) FindByUsername(username string) (entities.User, error)
 	if err := db.database.Where("username = ?", username).First(&user).Error; err != nil {
 		return user, err
 	}
+
 	return user, nil
 }
 
@@ -40,6 +41,7 @@ func (db *UserRepository) UpdateUsername(user entities.User, newUsername string)
 	}
 
 	user.Username = newUsername
+
 	return db.database.Save(user).Error
 }
 
@@ -50,5 +52,6 @@ func (db *UserRepository) UpdateBio(user entities.User, newBio string) error {
 }
 
 func (db *UserRepository) DeleteUser(user entities.User) error {
+
 	return db.database.Delete(user).Error
 }

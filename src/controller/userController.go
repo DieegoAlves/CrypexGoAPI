@@ -6,11 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	"os"
 	"time"
 )
-
-var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 type UserController struct {
 	service services.UserService
@@ -29,9 +26,12 @@ func NewUserController(userService services.UserService) UserController {
 
 func (u *UserController) CreateUser(ctx *gin.Context) {
 	user := entities.User{}
+
 	user.CreatedAt = time.Now().UTC()
 	user.UpdatedAt = time.Now().UTC()
+
 	user.ID = uuid.New()
+
 	err := ctx.ShouldBindBodyWithJSON(&user)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
@@ -54,13 +54,14 @@ func (u *UserController) CreateUser(ctx *gin.Context) {
 }
 
 func (u *UserController) Login(ctx *gin.Context) {
-
 	var userCredentials credentials
+
 	err := ctx.ShouldBindJSON(&userCredentials)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, err)
 		return
 	}
+
 	if userCredentials.Password == "" || userCredentials.Username == "" {
 		ctx.JSON(http.StatusBadRequest, "empty field")
 	}
@@ -78,7 +79,7 @@ func (u *UserController) Login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "login successful",
+		"message": "login successfully",
 		"token":   token,
 	})
 }
@@ -106,6 +107,7 @@ func (u *UserController) UpdateUsername(ctx *gin.Context) {
 	if !exists {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 	}
+
 	newUsername := ctx.PostForm("new_username")
 
 	if err := u.service.UpdateUsername(currentUsername.(string), newUsername); err != nil {
@@ -121,6 +123,7 @@ func (u *UserController) UpdateBio(ctx *gin.Context) {
 	if !exists {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 	}
+
 	newBio := ctx.PostForm("new_bio")
 
 	if err := u.service.UpdateBio(username.(string), newBio); err != nil {
@@ -132,6 +135,7 @@ func (u *UserController) UpdateBio(ctx *gin.Context) {
 
 func (u *UserController) DeleteUser(ctx *gin.Context) {
 	var userCredentials credentials
+
 	err := ctx.ShouldBindJSON(&userCredentials)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, err)

@@ -9,7 +9,6 @@ import (
 	"github.com/DieegoAlves/CrypexGoAPI/src/services"
 	"github.com/gin-gonic/gin"
 	"log"
-	"net/http"
 	"os"
 )
 
@@ -30,8 +29,6 @@ func main() {
 	secure := r.Group("/secure")
 	secure.Use(middlewares.JWTAuthMiddleware())
 	{
-		secure.GET("/auth", AuthHandler)
-
 		secure.GET("/profile", userController.GetUser)
 
 		secure.PUT("/update/username", userController.UpdateUsername)
@@ -55,10 +52,4 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-}
-
-func AuthHandler(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Welcome to the protected route!",
-	})
 }

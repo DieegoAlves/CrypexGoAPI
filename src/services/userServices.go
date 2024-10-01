@@ -29,27 +29,34 @@ func (s *UserService) CreateUser(user *entities.User) error {
 	if err != nil {
 		return err
 	}
+
 	user.Salt = Salt
 	user.Password = hashPassword(user.Password, user.Salt)
+
 	err = s.repository.AddNewUser(user)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func generateSalt() (string, error) {
 	salt := make([]byte, 16)
+
 	_, err := rand.Read(salt)
 	if err != nil {
 		return "", err
 	}
+
 	return hex.EncodeToString(salt), nil
 }
 
 func hashPassword(password, salt string) string {
 	sha := sha256.New()
+
 	sha.Write([]byte(password + salt))
+
 	return hex.EncodeToString(sha.Sum(nil))
 }
 
@@ -61,7 +68,6 @@ func (s *UserService) VerifyCredentials(username, password string) (bool, error)
 
 	hashedPassword := hashPassword(password, user.Salt)
 
-	//verify in DB
 	if user.Password != hashedPassword {
 		return false, errors.New("password incorrect")
 	}
@@ -101,6 +107,7 @@ func (s *UserService) UpdateUsername(currentUsername, newUsername string) error 
 	if err != nil {
 		return errors.New("user not found")
 	}
+
 	if err := s.repository.UpdateUsername(user, newUsername); err != nil {
 		return err
 	}
@@ -127,5 +134,6 @@ func (s *UserService) DeleteUser(user entities.User) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
